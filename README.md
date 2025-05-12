@@ -1,4 +1,4 @@
-# SS Desktop App
+# Screenshot-Automate Desktop App
 
 A FastAPI-based backend for desktop window automation and screenshotting, designed for integration with a web frontend and AI-driven workflows.
 
