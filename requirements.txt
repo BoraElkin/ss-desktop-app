@@ -5,4 +5,6 @@ pygetwindow
 mss
 pillow
 psutil
-PySimpleGUI 
+requests
+Pillow
+PySimpleGUI==4.60.5 

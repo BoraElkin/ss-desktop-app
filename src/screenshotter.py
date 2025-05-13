@@ -82,14 +82,10 @@ def get_window_by_id(window_id):
                 Quartz.kCGNullWindowID
             )
             all_ids = [str(win.get('kCGWindowNumber')) for win in cg_windows]
-            print(f"Looking for window_id={window_id} in {all_ids}")
             for win in cg_windows:
                 wid = str(win.get('kCGWindowNumber'))
-                print(f"Comparing {wid} to {window_id}")
                 if wid == str(window_id):
-                    print("Found window!")
                     return win
-            print("Window not found!")
             raise ValueError(f'Window with id {window_id} not found')
         except Exception as e:
             raise ValueError(f'Error getting window by id on macOS: {e}')

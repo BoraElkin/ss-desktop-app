@@ -1,13 +1,44 @@
-from fastapi import FastAPI, Response, HTTPException, Body
+from fastapi import FastAPI, Response, HTTPException, Body, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import time
 from typing import List, Dict
-from .screenshotter import list_windows, screenshot_window, activate_window
+from .screenshotter import list_windows, screenshot_window, activate_window, get_frontmost_app, get_frontmost_window_windows, get_window_by_id
 import pyautogui
+import os
+import json
+import platform
+import subprocess
 
 app = FastAPI(root_path="/api/v1")
 start_time = time.time()
+
+LOG_PATH = os.path.join(os.getcwd(), "app.log")
+
+def log_request(request: Request, response_status: int, payload=None):
+    log_entry = {
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        "endpoint": str(request.url.path),
+        "method": request.method,
+        "status": response_status,
+        "payload": payload,
+    }
+    with open(LOG_PATH, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    try:
+        body = await request.body()
+        try:
+            payload = body.decode()
+        except Exception:
+            payload = str(body)
+    except Exception:
+        payload = None
+    response = await call_next(request)
+    log_request(request, response.status_code, payload)
+    return response
 
 class Bounds(BaseModel):
     x: int
@@ -48,7 +79,14 @@ def get_window_screenshot(window_id: str):
 
 @app.post("/automate")
 def automate(req: AutomateRequest):
+    prev_app = None
+    prev_win = None
+    w = get_window_by_id(req.window_id)
     try:
+        if platform.system() == "Darwin":
+            prev_app = get_frontmost_app()
+        elif platform.system() == "Windows":
+            prev_win = get_frontmost_window_windows()
         activate_window(req.window_id)
         time.sleep(0.5)
         for action in req.actions:
@@ -59,6 +97,38 @@ def automate(req: AutomateRequest):
             # Log the action
             with open("dtop_automation.log", "a") as logf:
                 logf.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} window_id={req.window_id} x={action.x} y={action.y} text={action.text}\n")
+        # Restore previous app (macOS) or window (Windows)
+        if prev_app and platform.system() == "Darwin":
+            owner = w.get('kCGWindowOwnerName') if isinstance(w, dict) else None
+            if prev_app != owner:
+                script = f'tell application "{prev_app}" to activate'
+                subprocess.run(['osascript', '-e', script])
+        elif prev_win and platform.system() == "Windows":
+            try:
+                prev_win.activate()
+            except Exception as e:
+                print(f"Error restoring previous window on Windows: {e}")
         return {"status": "ok"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Automation failed: {e}") 
+        raise HTTPException(status_code=500, detail=f"Automation failed: {e}")
+
+@app.get("/logs")
+def get_logs(limit: int = Query(50, ge=1, le=500)):
+    log_path = os.path.join(os.getcwd(), "app.log")
+    if not os.path.exists(log_path):
+        return []
+    with open(log_path, "r") as f:
+        lines = f.readlines()[-limit:]
+    # Each log line should be a JSON object or a simple delimited string
+    # For now, just return the raw lines, but you can parse as needed
+    entries = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+        except Exception:
+            entry = {"raw": line}
+        entries.append(entry)
+    return entries 
