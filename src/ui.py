@@ -5,11 +5,13 @@
 import sys
 import os
 
-# Set working directory to project root (parent of src/) and ensure it's in sys.path
-APP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if APP_ROOT not in sys.path:
-    sys.path.insert(0, APP_ROOT)
-os.chdir(APP_ROOT)
+# Always set the working directory appropriately
+if getattr(sys, 'frozen', False):
+    # If running as a PyInstaller bundle, set CWD to the bundle directory
+    os.chdir(sys._MEIPASS)
+else:
+    # In dev, set to project root
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import webview
 import subprocess
