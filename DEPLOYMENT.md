@@ -30,6 +30,8 @@ python src/ui.py
 
 - This will start the FastAPI backend and open a native desktop window to the web UI.
 - The backend runs at `http://127.0.0.1:8000`.
+- The UI is served at `http://127.0.0.1:8000/ui/index.html` (not file://).
+- The UI and API must be served from the same origin for full functionality.
 
 ---
 
@@ -41,7 +43,7 @@ python src/ui.py
     main.py         # FastAPI backend
     ui.py           # PyWebview launcher
     ...
-  /web (optional)   # Place your frontend files here if using custom HTML/JS
+  /ui               # Frontend HTML/JS for the UI
   requirements.txt
   DEPLOYMENT.md
 ```
@@ -80,13 +82,13 @@ You can use [PyInstaller](https://pyinstaller.org/) to bundle the app into a sin
 
 - If the desktop window does not appear, check your Python and PyWebview installation.
 - If the backend does not start, ensure no other process is using port 8000.
-- For static file serving, ensure your frontend files are in the correct directory and referenced properly in `main.py`.
+- For static file serving, ensure your frontend files are in the `/ui` directory and referenced properly in `main.py`.
 
 ---
 
 ## 8. Further Customization
 
-- To customize the frontend, edit or add files in the `/web` directory and update your FastAPI static files configuration.
+- To customize the frontend, edit or add files in the `/ui` directory and update your FastAPI static files configuration if needed.
 - For advanced packaging (with icons, splash screens, etc.), refer to the PyInstaller and PyWebview documentation.
 
 ---

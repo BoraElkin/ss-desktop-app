@@ -97,6 +97,7 @@ Returns the last N log entries from the automation log.
   - `pyautogui`
   - `mss`
   - `pydantic`
+  - `pywebview`
 
 Install dependencies:
 ```sh
@@ -105,14 +106,31 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Server
+## Running the Server and UI
 
 ```sh
-uvicorn src.main:app --reload
+python src/ui.py
 ```
 
-- The API will be available at `http://127.0.0.1:8000/api/v1/`
-- Interactive docs: `http://127.0.0.1:8000/docs`
+- This will start the FastAPI backend and open a native desktop window to the web UI.
+- The backend runs at `http://127.0.0.1:8000`.
+- The UI is served at `http://127.0.0.1:8000/ui/index.html` (not file://).
+- The UI and API must be served from the same origin for full functionality.
+
+---
+
+## Project Structure
+
+```
+/dtop-app
+  /src
+    main.py         # FastAPI backend
+    ui.py           # PyWebview launcher
+    ...
+  /ui               # Frontend HTML/JS for the UI
+  requirements.txt
+  README.md
+```
 
 ---
 
