@@ -4,6 +4,16 @@ A FastAPI-based backend for desktop window automation and screenshotting, design
 
 ---
 
+## Quick Launch
+
+To start the app, just run:
+
+```sh
+./run.sh
+```
+
+---
+
 ## Features
 
 - **Health check endpoint**
@@ -130,6 +140,7 @@ python src/ui.py
   /ui               # Frontend HTML/JS for the UI
   requirements.txt
   README.md
+  run.sh
 ```
 
 ---
