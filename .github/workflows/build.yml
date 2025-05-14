@@ -16,7 +16,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-        
+
+    - name: List files before build
+      run: |
+        ls -l
+        ls -l ui
+        ls -l src
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -45,4 +51,4 @@ jobs:
           release/DTopApp-macOS.zip
         generate_release_notes: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GH.PAT }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
