@@ -4,9 +4,18 @@ A FastAPI-based backend for desktop window automation and screenshotting, design
 
 ---
 
-## Quick Launch
+## Quick Start
 
-To start the app, just run:
+### Option 1: Download Latest Release (Recommended for Users)
+
+1. Go to the [Releases](https://github.com/yourusername/dtop-app/releases) page
+2. Download the latest `DTopApp-macOS.zip`
+3. Extract the zip file
+4. Double-click `DTopApp.app` to run
+
+**Note:** The app is automatically built and released when we push a new version tag.
+
+### Option 2: Run from Source (For Developers)
 
 ```sh
 ./run.sh
@@ -38,6 +47,11 @@ Returns the health status and uptime of the server.
 }
 ```
 
+**Test with curl:**
+```sh
+curl http://127.0.0.1:8000/api/v1/health
+```
+
 ---
 
 ### 2. `GET /api/v1/windows`
@@ -56,6 +70,11 @@ Lists all open, user-facing windows with their IDs, titles, and bounds.
 ]
 ```
 
+**Test with curl:**
+```sh
+curl http://127.0.0.1:8000/api/v1/windows
+```
+
 ---
 
 ### 3. `GET /api/v1/windows/{window_id}/screenshot`
@@ -64,6 +83,11 @@ Returns a PNG screenshot of the specified window's client area.
 
 **Response:**  
 - `image/png` binary data
+
+**Test with curl:**
+```sh
+curl http://127.0.0.1:8000/api/v1/windows/<window_id>/screenshot --output screenshot.png
+```
 
 ---
 
@@ -88,11 +112,34 @@ Automates actions (mouse clicks and typing) in a specified window.
 { "status": "ok" }
 ```
 
+**Test with curl:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/v1/automate \
+  -H "Content-Type: application/json" \
+  -d '{"window_id": "<window_id>", "actions": [{"x": 100, "y": 100, "text": "Hello"}]}'
+```
+
 ---
 
-### 5. `GET /api/v1/logs?limit=N` *(Planned)*
+### 5. `GET /api/v1/logs?limit=N`
 **Description:**  
 Returns the last N log entries from the automation log.
+
+**Test with curl:**
+```sh
+curl http://127.0.0.1:8000/api/v1/logs
+```
+
+---
+
+### 6. `GET /api/v1/requests_log`
+**Description:**  
+Returns the last N entries from the requests log.
+
+**Test with curl:**
+```sh
+curl http://127.0.0.1:8000/api/v1/requests_log
+```
 
 ---
 
@@ -154,6 +201,8 @@ python src/ui.py
   - IDs may change if you close/reopen windows. Always fetch the latest list before automating.
 - **Automation:**  
   - Coordinates are absolute screen positions. Use screenshots to determine the correct values.
+- **Bundled App:**  
+  - The app is now bundled with PyInstaller and works correctly in both development and bundled modes.
 
 ---
 
@@ -169,3 +218,37 @@ python src/ui.py
 ## License
 
 MIT 
+
+## Building the App
+
+### For Users
+Simply download the latest release from the [Releases](https://github.com/BoraElkin/ss-desktop-app/releases) page.
+
+### For Developers
+If you want to build the app yourself:
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/yourusername/dtop-app.git
+   cd dtop-app
+   ```
+
+2. Run the build script:
+   ```sh
+   ./build.sh
+   ```
+
+3. The bundled app will be in the `release` directory:
+   - `release/DTopApp.app` - The macOS application bundle
+   - `release/DTopApp-macOS.zip` - A zip file containing the app
+
+### Creating a New Release
+To create a new release:
+
+1. Update the version in your code
+2. Create and push a new tag:
+   ```sh
+   git tag v1.0.0  # Use appropriate version number
+   git push origin v1.0.0
+   ```
+3. GitHub Actions will automatically build and create a new release 

@@ -33,6 +33,40 @@ python src/ui.py
 - The UI is served at `http://127.0.0.1:8000/ui/index.html` (not file://).
 - The UI and API must be served from the same origin for full functionality.
 
+**Test the API with curl:**
+
+- Health check:
+  ```sh
+  curl http://127.0.0.1:8000/api/v1/health
+  ```
+
+- List windows:
+  ```sh
+  curl http://127.0.0.1:8000/api/v1/windows
+  ```
+
+- Screenshot a window:
+  ```sh
+  curl http://127.0.0.1:8000/api/v1/windows/<window_id>/screenshot --output screenshot.png
+  ```
+
+- Automate actions:
+  ```sh
+  curl -X POST http://127.0.0.1:8000/api/v1/automate \
+    -H "Content-Type: application/json" \
+    -d '{"window_id": "<window_id>", "actions": [{"x": 100, "y": 100, "text": "Hello"}]}'
+  ```
+
+- Get logs:
+  ```sh
+  curl http://127.0.0.1:8000/api/v1/logs
+  ```
+
+- Get requests log:
+  ```sh
+  curl http://127.0.0.1:8000/api/v1/requests_log
+  ```
+
 ---
 
 ## 4. Project Structure
@@ -60,13 +94,13 @@ You can use [PyInstaller](https://pyinstaller.org/) to bundle the app into a sin
    ```
 2. Build the executable:
    ```bash
-   pyinstaller --onefile src/ui.py
+   pyinstaller --name DTopApp --windowed --onedir --add-data "src:src" --add-data "ui:ui" src/ui.py
    ```
 3. The output will be in the `dist/` directory.
 
 **Note:**
 - Ensure all static files and models are included or referenced correctly.
-- You may need to adjust paths in your code for bundled apps.
+- The bundled app now works correctly in both development and bundled modes.
 
 ---
 

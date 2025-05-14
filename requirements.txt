@@ -6,4 +6,5 @@ mss
 pillow
 psutil
 requests
-pywebview 
+pywebview
+pyinstaller 

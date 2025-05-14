@@ -10,9 +10,17 @@ import os
 import json
 import platform
 import subprocess
+import sys
+
+if getattr(sys, 'frozen', False):
+    # Running as a PyInstaller bundle
+    ui_dir = os.path.join(sys._MEIPASS, 'ui')
+else:
+    # Running in dev mode
+    ui_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ui')
 
 app = FastAPI()
-app.mount("/ui", StaticFiles(directory="ui", html=True), name="ui")
+app.mount("/ui", StaticFiles(directory=ui_dir, html=True), name="ui")
 start_time = time.time()
 
 LOG_PATH = os.path.join(os.getcwd(), "app.log")
@@ -87,7 +95,7 @@ def get_window_screenshot(window_id: str):
         png_bytes = screenshot_window(window_id)
         return Response(content=png_bytes, media_type="image/png")
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Window not found or screenshot failed: {e}")
+        raise HTTPException(status_code=404, detail=f"Window not found or screenshot failed: {e}") 
 
 @app.post("/api/v1/automate")
 def automate(req: AutomateRequest):
