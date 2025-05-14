@@ -33,8 +33,8 @@ jobs:
         pyinstaller --name DTopApp \
                     --windowed \
                     --onedir \
-                    --add-data "src:src" \
-                    --add-data "ui:ui" \
+                    --add-data "$(pwd)/src:src" \
+                    --add-data "$(pwd)/ui:ui" \
                     src/ui.py
                     
     - name: Create release directory
